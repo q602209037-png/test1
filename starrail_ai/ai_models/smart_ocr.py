@@ -23,10 +23,17 @@ class SmartOCR:
     def _init_ocr(self):
         try:
             from paddleocr import PaddleOCR
-            self.ocr = PaddleOCR(use_angle_cls=True, lang='ch', use_gpu=self.use_gpu, show_log=False)
+            # 修复：移除 show_log 参数（新版本不支持）
+            self.ocr = PaddleOCR(
+                use_angle_cls=True, 
+                lang='ch', 
+                use_gpu=self.use_gpu
+            )
             print("PaddleOCR 初始化成功")
         except ImportError:
             print("警告：PaddleOCR 未安装，OCR 功能将不可用")
+        except Exception as e:
+            print(f"OCR 初始化失败：{e}")
 
     def recognize(self, image) -> List[Dict]:
         if self.ocr is None:
