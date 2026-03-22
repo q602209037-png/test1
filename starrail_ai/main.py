@@ -171,14 +171,23 @@ class StarRailAI:
 
 def main():
     parser = argparse.ArgumentParser(description="星穹铁道 AI 自动化系统")
-    parser.add_argument("command", choices=["run", "train", "demo"])
-    parser.add_argument("--mode", type=str, default="daily")
-    parser.add_argument("--device", type=str, default="cpu", choices=["cpu", "cuda"])
-    parser.add_argument("--duration", type=int, default=None)
-    parser.add_argument("--max-iterations", type=int, default=None)
-    parser.add_argument("--config", type=str, default="config/config.yaml")
-    parser.add_argument("--data", type=str, default=None)
-    parser.add_argument("--use-gpu-ocr", action="store_true")
+    parser.add_argument("command", choices=["run", "train", "demo"],
+                       help="命令：run(运行), train(训练), demo(演示)")
+    parser.add_argument("--mode", type=str, default="daily",
+                       choices=["daily", "battle", "explore"],
+                       help="运行模式")
+    parser.add_argument("--device", type=str, default="cpu",
+                       choices=["cpu", "cuda"], help="运行设备")
+    parser.add_argument("--duration", type=int, default=None,
+                       help="运行时长 (秒)")
+    parser.add_argument("--max-iterations", type=int, default=None,
+                       help="最大迭代次数")
+    parser.add_argument("--config", type=str, default="config/config.yaml",
+                       help="配置文件路径")
+    parser.add_argument("--data", type=str, default=None,
+                       help="训练数据路径")
+    parser.add_argument("--use-gpu-ocr", action="store_true",
+                       help="OCR 使用 GPU 加速")
     args = parser.parse_args()
     
     ai = StarRailAI(config_path=args.config, device=args.device, use_gpu_ocr=args.use_gpu_ocr)
