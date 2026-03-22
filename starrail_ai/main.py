@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-星穹铁道 AI 自动化系统 - 完整版
-支持后台运行、自动启动游戏、不占用鼠标键盘
-"""
+"""星穹铁道 AI 自动化系统 v2.0"""
 
 import sys
 import time
@@ -20,17 +17,12 @@ from core.screen_capture import ScreenCapture, GameWindow
 
 
 class StarRailAI:
-    """星穹铁道 AI 主类"""
-
     def __init__(self, device: str = "cpu", auto_start: bool = True):
-        self.device = device
-        
         print("=" * 70)
         print("星穹铁道 AI 自动化系统 v2.0")
         print("=" * 70)
         print()
         
-        # 1. 查找/启动游戏
         print("正在查找星穹铁道窗口...")
         self.game_window = GameWindow()
         
@@ -42,48 +34,37 @@ class StarRailAI:
                 for i in range(60):
                     time.sleep(1)
                     if self.game_window.find_window():
-                        print(f"✓ 游戏已启动！窗口：{self.game_window.title}")
+                        print(f"✓ 游戏已启动！")
                         break
-                    print(f"  等待中... ({i+1}/60)")
+                    if i % 10 == 9:
+                        print(f"  等待中... ({i+1}/60)")
             else:
-                print("❌ 未找到游戏窗口，请手动启动游戏后重试")
+                print("❌ 未找到游戏窗口")
                 sys.exit(1)
         
         if not self.game_window.find_window():
-            print("❌ 游戏启动失败，请检查游戏路径配置")
+            print("❌ 游戏启动失败")
             sys.exit(1)
         
-        print()
         print(f"✓ 游戏窗口：{self.game_window.title}")
-        print(f"✓ 窗口位置：{self.game_window.rect}")
+        print(f"✓ 分辨率：{self.game_window.rect['width']}x{self.game_window.rect['height']}")
         print()
         
-        # 2. 初始化 AI 模块
         print("初始化 AI 模块...")
-        print("✓ 屏幕捕获模块 (后台截图)")
         self.screen_capture = ScreenCapture(window=self.game_window)
-        
-        print("✓ 深度学习模型")
         self.ai_model = GameAIModel(device=device)
-        
-        print("✓ 智能 OCR")
         self.ocr = SmartOCR()
         self.text_ai = TextUnderstandingAI()
-        
-        print("✓ 决策引擎")
         self.decision_engine = IntelligentDecisionEngine()
         
-        print()
-        print(f"✓ AI 系统就绪！设备：{device}")
+        print("✓ AI 系统就绪!")
         print("=" * 70)
         print()
 
-    def capture_screen(self) -> np.ndarray:
-        """后台捕获游戏画面"""
+    def capture_screen(self):
         return self.screen_capture.capture()
 
-    def analyze_screen(self, screen: np.ndarray) -> Dict:
-        """分析屏幕"""
+    def analyze_screen(self, screen):
         ai_result = self.ai_model.infer(screen)
         ocr_texts = self.ocr.recognize(screen)
         text_understanding = self.ocr.understand_text(ocr_texts)
@@ -105,40 +86,52 @@ class StarRailAI:
             "quest_info": quest_info,
         }
 
-    def decide_action(self, screen: np.ndarray) -> Dict:
-        """决策"""
-        analysis = self.analyze_screen(screen)
-        decision = self.decision_engine.get_context_aware_action(screen)
-        decision["analysis"] = analysis
-        return decision
-
     def execute_action(self, decision: Dict):
-        """执行动作（后台）"""
         action = decision.get("action", "wait")
         confidence = decision.get("confidence", 0)
-        print(f"执行：{action} (置信度：{confidence:.2%})")
+        reason = decision.get("reason", "")
+        print(f"  → {action} ({reason})")
         
-        if action == "wait":
-            time.sleep(1)
-        elif action == "click":
-            x = decision.get("x", self.game_window.width // 2)
-            y = decision.get("y", self.game_window.height // 2)
-            self.game_window.click(x, y)
-        elif action == "track_quest":
-            print("  → 追踪任务...")
-            # 点击任务追踪按钮 (示例位置)
-            self.game_window.click(100, 100)
-            time.sleep(2)
-        elif action == "claim_reward":
-            print("  → 领取奖励...")
-            self.game_window.press_key('space')
-            time.sleep(1)
-        elif action == "break_loop":
-            print("  → 打破死循环...")
-            self.game_window.press_key('esc')
-            time.sleep(1)
-        else:
-            time.sleep(0.5)
+        try:
+            if action == "wait":
+                time.sleep(1)
+            
+            elif action == "click":
+                x = decision.get("x", self.game_window.rect["width"] // 2)
+                y = decision.get("y", self.game_window.rect["height"] // 2)
+                self.game_window.click(x, y)
+            
+            elif action == "track_quest":
+                # 点击任务面板
+                self.game_window.click(self.game_window.rect["width"] // 4, 
+                                      self.game_window.rect["height"] // 2)
+                time.sleep(1)
+            
+            elif action == "claim_reward":
+                # 点击领取奖励按钮
+                self.game_window.click(self.game_window.rect["width"] // 2,
+                                      self.game_window.rect["height"] * 3 // 4)
+                time.sleep(1)
+            
+            elif action == "explore_move":
+                # 随机移动视角
+                x = decision.get("x", self.game_window.rect["width"] // 2)
+                y = decision.get("y", self.game_window.rect["height"] // 2)
+                self.game_window.click(x, y)
+                time.sleep(0.5)
+            
+            elif action == "battle_attack":
+                # 战斗中点击攻击
+                self.game_window.click(self.game_window.rect["width"] // 2,
+                                      self.game_window.rect["height"] // 2)
+                time.sleep(1)
+            
+            elif action == "break_loop":
+                # 打破死循环
+                self.game_window.press_key("esc")
+                time.sleep(1)
+        except Exception as e:
+            print(f"    执行失败：{e}")
 
     def run(self, mode: str = "daily", duration: Optional[int] = None,
             max_iterations: Optional[int] = None):
@@ -160,26 +153,26 @@ class StarRailAI:
                     break
                 
                 iteration += 1
-                print(f"\n[{iteration}]")
+                print(f"[{iteration}]")
                 
-                # 检查窗口是否还存在
                 if not self.game_window.find_window():
-                    print("❌ 游戏窗口丢失，停止运行")
+                    print("❌ 游戏窗口丢失")
                     break
                 
                 # 捕获
                 screen = self.capture_screen()
-                print(f"✓ 截图：{screen.shape}")
+                print(f"  截图：{screen.shape}")
                 
                 # 分析
                 analysis = self.analyze_screen(screen)
                 if analysis["quest_info"]:
                     qi = analysis["quest_info"]
-                    print(f"✓ 任务：{qi.get('quest_type')}")
+                    print(f"  任务：{qi.get('quest_type')}")
                 
-                # 决策
-                decision = self.decide_action(screen)
-                print(f"✓ 决策：{decision.get('action')}")
+                # 决策（传入 OCR 数据）
+                ocr_texts = analysis.get("ocr_texts", [])
+                decision = self.decision_engine.get_context_aware_action(screen, ocr_texts)
+                print(f"  界面：{decision.get('screen_type')}")
                 
                 # 执行
                 self.execute_action(decision)
@@ -189,8 +182,6 @@ class StarRailAI:
             print("\n\n⚠ 用户中断")
         except Exception as e:
             print(f"\n\n❌ 错误：{e}")
-            import traceback
-            traceback.print_exc()
         finally:
             print(f"\n总迭代：{iteration}")
 
@@ -200,27 +191,27 @@ class StarRailAI:
         print("=" * 70)
         print()
         print("系统组件:")
-        print("  • GameAIModel - 深度学习模型 (~2.5M 参数)")
+        print("  • GameAIModel - 深度学习模型")
         print("  • SmartOCR - 智能 OCR")
-        print("  • DecisionEngine - 决策引擎")
+        print("  • DecisionEngine - 智能决策")
         print("  • ScreenCapture - 后台截图")
         print()
         print("功能:")
-        print("  ✓ 后台运行，不占用鼠标键盘")
-        print("  ✓ 自动查找/启动游戏")
-        print("  ✓ 智能识别任务")
-        print("  ✓ 自主决策行动")
+        print("  ✓ 后台运行")
+        print("  ✓ 自动启动游戏")
+        print("  ✓ 智能识别界面")
+        print("  ✓ 状态机决策")
         print()
 
 
 def main():
-    parser = argparse.ArgumentParser(description="星穹铁道 AI 自动化系统")
+    parser = argparse.ArgumentParser(description="星穹铁道 AI")
     parser.add_argument("command", choices=["run", "train", "demo"])
     parser.add_argument("--mode", type=str, default="daily")
-    parser.add_argument("--device", type=str, default="cpu", choices=["cpu", "cuda"])
+    parser.add_argument("--device", type=str, default="cpu")
     parser.add_argument("--duration", type=int, default=None)
     parser.add_argument("--max-iterations", type=int, default=None)
-    parser.add_argument("--no-auto-start", action="store_true", help="不自动启动游戏")
+    parser.add_argument("--no-auto-start", action="store_true")
     args = parser.parse_args()
     
     ai = StarRailAI(device=args.device, auto_start=not args.no_auto_start)
