@@ -1,0 +1,83 @@
+# 星穹铁道 AI 配置文件
+
+[general]
+# 设备选择：cpu 或 cuda
+device = "cpu"
+
+# 游戏窗口标题
+game_window_title = "崩坏：星穹铁道"
+
+# 截图保存目录
+screenshot_dir = "assets/screenshots"
+
+# 日志目录
+log_dir = "logs"
+
+[ai_model]
+# 预训练模型路径
+checkpoint_path = "ai_models/checkpoints/final_model.pt"
+
+# 模型置信度阈值
+confidence_threshold = 0.7
+
+# 决策历史长度
+decision_history_size = 50
+
+[ocr]
+# 是否使用 GPU 加速 OCR
+use_gpu_ocr = false
+
+# OCR 语言
+language = "ch"
+
+# 是否显示 OCR 日志
+show_ocr_log = false
+
+[automation]
+# 动作延迟 (秒)
+action_delay = 0.5
+
+# 点击延迟 (秒)
+click_delay = 0.2
+
+# 是否启用随机延迟 (防检测)
+enable_random_delay = true
+
+# 随机延迟范围 (秒)
+random_delay_range = [0.1, 0.5]
+
+[daily_tasks]
+# 每日任务优先级 (1-10)
+daily_quest_priority = 10
+
+# 是否自动领取奖励
+auto_claim_reward = true
+
+# 是否自动完成实训
+auto_complete_training = true
+
+# 优先完成的任务类型
+priority_quest_types = ["daily", "weekly", "event"]
+
+[safety]
+# 最大连续操作次数
+max_continuous_actions = 100
+
+# 操作间隔休息 (秒)
+rest_interval = 300
+
+# 检测死循环
+enable_loop_detection = true
+
+# 死循环检测阈值
+loop_detection_threshold = 10
+
+[logging]
+# 日志级别：DEBUG, INFO, WARNING, ERROR
+level = "INFO"
+
+# 是否保存日志到文件
+save_to_file = true
+
+# 日志格式
+format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

@@ -1,0 +1,68 @@
+# 星穹铁道 AI 自动化系统 - 依赖配置
+
+[project]
+name = "starrail-ai"
+version = "0.1.0"
+description = "基于深度学习的星穹铁道自动化 AI 系统"
+authors = ["AI Agent"]
+requires-python = ">=3.8"
+
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["starrail_ai"]
+
+[dependencies]
+# 深度学习框架
+torch = ">=2.0.0"
+torchvision = ">=0.15.0"
+
+# 图像处理
+opencv-python = ">=4.8.0"
+opencv-contrib-python = ">=4.8.0"
+Pillow = ">=10.0.0"
+numpy = ">=1.24.0"
+
+# 屏幕捕获
+mss = ">=9.0.0"
+pygetwindow = ">=0.0.9"
+
+# OCR 文字识别
+paddlepaddle = ">=2.5.0"
+paddleocr = ">=2.7.0"
+
+# 自动化控制
+pyautogui = ">=0.9.54"
+
+# 数据处理
+pandas = ">=2.0.0"
+
+# 工具库
+tqdm = ">=4.65.0"
+rich = ">=13.0.0"  # 美化命令行输出
+
+# 可选：GPU 加速 (NVIDIA)
+# cuda-python = ">=12.0.0"
+
+[tool.setuptools.package-data]
+"*" = ["*.pt", "*.pth", "*.onnx"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0"
+]
+
+gpu = [
+    "torch>=2.0.0+cu118",
+    "torchvision>=0.15.0+cu118",
+    "paddlepaddle-gpu>=2.5.0"
+]
+
+[project.scripts]
+starrail-ai = "starrail_ai.main:main"
